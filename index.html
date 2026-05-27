@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI 对话</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        #chat-box { height: 400px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        .user { text-align: right; margin: 8px 0; }
+        .ai { text-align: left; margin: 8px 0; color: #333; }
+        .user span { background: #007bff; color: white; padding: 8px 12px; border-radius: 12px; display: inline-block; }
+        .ai span { background: #f0f0f0; padding: 8px 12px; border-radius: 12px; display: inline-block; }
+        #input-area { display: flex; gap: 10px; }
+        #user-input { flex: 1; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>AI 对话</h2>
+    <div id="chat-box"></div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="输入你的问题..." />
+        <button onclick="sendMessage()">发送</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatBox.innerHTML += `<div class="user"><span>${message}</span></div>`;
+            input.value = "";
+
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({message: message})
+            });
+
+            const data = await response.json();
+            chatBox.innerHTML += `<div class="ai"><span>${data.reply}</span></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        document.getElementById("user-input").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+</html>
